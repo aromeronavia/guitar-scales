@@ -6,31 +6,43 @@
       </li>
     </ul>
     <div class="strings">
-      <div class="string"></div>
-      <div class="string"></div>
-      <div class="string"></div>
-      <div class="string"></div>
-      <div class="string"></div>
-      <div class="string"></div>
+      <div class="string" />
+      <div class="string" />
+      <div class="string" />
+      <div class="string" />
+      <div class="string" />
+      <div class="string" />
     </div>
 
     <label>Note</label>
-    <select>
-      <option value="E">E</option>
+    <select v-model="currentTone">
+      <option
+        v-for="tone in tones"
+        :key="tone"
+        :value="tone"
+        :selected="tone === currentTone"
+        >{{ tone }}</option
+      >
     </select>
 
     <br />
 
     <label>Scale Mode</label>
-    <select>
-      <option value="dorian">Dorian Scale</option>
+    <select v-model="currentScale">
+      <option
+        v-for="scale in scalesOptions"
+        :key="scale"
+        :value="scale"
+        :selected="scale === currentScale"
+        >{{ scale }}</option
+      >
     </select>
   </div>
 </template>
 
 <script>
 const NUMBER_OF_FRETS = 13;
-const TOTAL_NOTES = 12;
+const NUMBER_OF_NOTES = 12;
 
 const tones = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
@@ -38,8 +50,8 @@ const buildString = note => {
   const index = tones.indexOf(note);
   const stringNotes = [];
 
-  for (let i = 0; i < TOTAL_NOTES; i++) {
-    stringNotes.push(tones[(index + i) % TOTAL_NOTES]);
+  for (let i = 0; i < NUMBER_OF_NOTES; i++) {
+    stringNotes.push(tones[(index + i) % NUMBER_OF_NOTES]);
   }
 
   return stringNotes;
@@ -53,42 +65,78 @@ const aString = buildString("A");
 
 const guitarStrings = [eString, bString, gString, dString, aString, eString];
 
-const doryan = ["E", "F#", "G", "A", "B", "C", "D"];
+const dorian = [2, 1, 2, 2, 2, 2];
+const eolian = [2, 1, 2, 2, 1, 2];
+const phrygian = [1, 2, 2, 2, 1, 2];
+
+const scales = { dorian, eolian, phrygian };
+const scalesOptions = Object.keys(scales);
 
 export default {
-  mounted: function() {
-    const buildFret = i => {
+  data: function() {
+    return { tones, currentTone: "E", scalesOptions, currentScale: "dorian" };
+  },
+  methods: {
+    buildFret(index) {
       const fret = document.createElement("div");
       fret.className = "fret";
-      fret.style.marginLeft = `${i * 64}px`;
+      fret.style.marginLeft = `${index * 64}px`;
 
       return fret;
-    };
-
-    const buildDot = i => {
+    },
+    buildDot(index) {
       const dot = document.createElement("div");
       dot.className = "dot";
-      dot.style.marginLeft = `${i * 64 + 28}px`;
+      dot.style.marginLeft = `${index * 64 + 28}px`;
 
       return dot;
-    };
+    },
+    resetStrings() {
+      const stringElements = document.getElementsByClassName("string");
+      stringElements.forEach(element => {
+        element.innerHTML = "";
+      });
+    },
+    drawScale() {
+      this.resetStrings();
 
+      guitarStrings.forEach((string, stringIndex) => {
+        let noteIndex = string.indexOf(this.currentTone);
+
+        const drawDot = () => {
+          const dot = this.buildDot(noteIndex);
+          const stringElement = document.getElementsByClassName("string")[
+            stringIndex
+          ];
+          stringElement.appendChild(dot);
+        };
+
+        scales[this.currentScale].forEach(interval => {
+          drawDot();
+          noteIndex = (noteIndex + interval) % NUMBER_OF_NOTES;
+        });
+
+        drawDot(); // draw last note
+        drawDot(); // draw last note
+      });
+    }
+  },
+  watch: {
+    currentTone: function() {
+      this.drawScale();
+    },
+    currentScale: function() {
+      this.drawScale();
+    }
+  },
+  mounted: function() {
     for (let i = 0; i < NUMBER_OF_FRETS; i++) {
-      const fret = buildFret(i);
+      const fret = this.buildFret(i);
       const container = document.getElementsByClassName("container")[0];
       container.appendChild(fret);
     }
 
-    console.warn(eString);
-
-    guitarStrings.forEach((string, index) => {
-      doryan.forEach(note => {
-        const fretNumber = string.indexOf(note);
-        const dot = buildDot(fretNumber);
-        const stringElement = document.getElementsByClassName("string")[index];
-        stringElement.appendChild(dot);
-      });
-    });
+    this.drawScale();
   }
 };
 </script>
