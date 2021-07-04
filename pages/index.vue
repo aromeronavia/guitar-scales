@@ -65,16 +65,32 @@ const aString = buildString("A");
 
 const guitarStrings = [eString, bString, gString, dString, aString, eString];
 
+const ionian = [2, 2, 1, 2, 2, 2];
 const dorian = [2, 1, 2, 2, 2, 2];
-const eolian = [2, 1, 2, 2, 1, 2];
 const phrygian = [1, 2, 2, 2, 1, 2];
+const lydian = [2, 2, 2, 1, 2, 2];
+const mixolydian = [2, 2, 1, 2, 2, 1];
+const aeolian = [2, 1, 2, 2, 1, 2];
+const locrian = [1, 2, 2, 1, 2, 2];
 
-const scales = { dorian, eolian, phrygian };
-const scalesOptions = Object.keys(scales);
+const scales = {
+  ionian,
+  dorian,
+  phrygian,
+  lydian,
+  mixolydian,
+  aeolian,
+  locrian
+};
 
 export default {
   data: function() {
-    return { tones, currentTone: "E", scalesOptions, currentScale: "dorian" };
+    return {
+      tones,
+      scalesOptions: Object.keys(scales),
+      currentTone: "E",
+      currentScale: "dorian"
+    };
   },
   methods: {
     buildFret(index) {
