@@ -148,7 +148,7 @@ export default {
   mounted: function() {
     for (let i = 0; i < NUMBER_OF_FRETS; i++) {
       const fret = this.buildFret(i);
-      const container = document.getElementsByClassName("container")[0];
+      const container = document.getElementsByClassName("strings")[0];
       container.appendChild(fret);
     }
 
@@ -183,8 +183,9 @@ html {
 .strings {
   display: flex;
   justify-content: center;
-  padding-top: 22px;
+  margin-top: 22px;
   flex-direction: column;
+  position: relative;
 }
 
 .dot {
@@ -210,7 +211,6 @@ html {
 .fret {
   position: absolute;
   height: 168px;
-  margin-top: 40px;
   border-radius: 4px;
   top: 0;
   width: 8px;
