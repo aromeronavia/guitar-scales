@@ -107,8 +107,11 @@ export default {
       const dot = document.createElement("div");
       dot.className = "dot";
       dot.style.marginLeft = `${(index * FRET_SIZE) + DOT_SIZE - FRET_SIZE}px`;
-      dot.title = note;
-      dot['data-note'] = note;
+
+      const tooltip = document.createElement("span");
+      tooltip.className = "tooltip";
+      tooltip.innerText = note;
+      dot.appendChild(tooltip);
 
       return dot;
     },
@@ -229,5 +232,23 @@ html {
   top: 0;
   width: 8px;
   background-color: brown;
+}
+
+.tooltip {
+  visibility: hidden;
+  width: 30px;
+  background-color: #AAA;
+  color: #fff;
+  text-align: center;
+  border-radius: 50px;
+  padding: 5px 0;
+  margin: 20px 20px;
+
+  position: absolute;
+  z-index: 1;
+}
+
+.dot:hover .tooltip {
+  visibility: visible;
 }
 </style>
