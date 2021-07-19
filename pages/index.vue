@@ -107,7 +107,7 @@ const major7 =          [4, 3, 4];
 const major9 =          [4, 3, 4, 3];
 const major11 =         [4, 3, 4, 3, 3];
 const dominant7 =       [4, 3, 3];
-const diminished =      [3, 3, 3, 3];
+const diminished =      [3, 3, 3];
 const halfDiminished =  [3, 3, 4];
 const minor =           [3, 4];
 const minor7 =          [3, 4, 3];
@@ -169,33 +169,26 @@ export default {
         element.innerHTML = "";
       });
     },
-    getNotesInCurrentScale() {
+    _getNotes(noteDistances) {
       const currentToneIndex = tones.indexOf(this.currentTone);
       const tonesStartingInSelected = tones.map((_, i) => tones[(currentToneIndex + i) % tones.length]);
 
-      const notesInScale = [tonesStartingInSelected[0]];
-      const selectedScale = scales[this.currentScale];
+      const notes = [tonesStartingInSelected[0]];
       let cursor = 0;
-      for (let i = 0; i < selectedScale.length; i ++) {
-        cursor = (cursor + selectedScale[i]) % tonesStartingInSelected.length;
-        notesInScale.push(tonesStartingInSelected[cursor]);
-      }
+      noteDistances.forEach((distance) => {
+        cursor = (cursor + distance) % tonesStartingInSelected.length;
+        notes.push(tonesStartingInSelected[cursor]);
+      });
 
-      return notesInScale;
+      return notes;
+    },
+    getNotesInCurrentScale() {
+      const selectedScale = scales[this.currentScale];
+      return this._getNotes(selectedScale);
     },
     getNotesInCurrentChord() {
-      const currentToneIndex = tones.indexOf(this.currentTone);
-      const tonesStartingInSelected = tones.map((_, i) => tones[(currentToneIndex + i) % tones.length]);
-
-      const notesInChord = [tonesStartingInSelected[0]];
       const selectedChord = chords[this.currentChord];
-      let cursor = 0;
-      for (let i = 0; i < selectedChord.length; i ++) {
-        cursor = (cursor + selectedChord[i]) % tonesStartingInSelected.length;
-        notesInChord.push(tonesStartingInSelected[cursor]);
-      }
-
-      return notesInChord;
+      return this._getNotes(selectedChord);
     },
     getChordFormat(notesInChord) {
       const formats = [
