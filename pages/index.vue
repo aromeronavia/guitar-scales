@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <ul class="fret-numbers">
-      <li class="fret-number" v-for="(n, i) in 12" :key="i + 1">
+      <li class="fret-number" v-for="(n, i) in 13" :key="i + 1">
         {{ i }}
       </li>
     </ul>
@@ -44,13 +44,16 @@
 const NUMBER_OF_FRETS = 13;
 const NUMBER_OF_NOTES = 12;
 
+const FRET_SIZE = 64;
+const DOT_SIZE = 28;
+
 const tones = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
 const buildString = note => {
   const index = tones.indexOf(note);
   const stringNotes = [];
 
-  for (let i = 0; i < NUMBER_OF_NOTES; i++) {
+  for (let i = 0; i < NUMBER_OF_FRETS; i++) {
     stringNotes.push(tones[(index + i) % NUMBER_OF_NOTES]);
   }
 
@@ -65,13 +68,13 @@ const aString = buildString("A");
 
 const guitarStrings = [eString, bString, gString, dString, aString, eString];
 
-const ionian = [2, 2, 1, 2, 2, 2];
-const dorian = [2, 1, 2, 2, 2, 2];
-const phrygian = [1, 2, 2, 2, 1, 2];
-const lydian = [2, 2, 2, 1, 2, 2];
-const mixolydian = [2, 2, 1, 2, 2, 1];
-const aeolian = [2, 1, 2, 2, 1, 2];
-const locrian = [1, 2, 2, 1, 2, 2];
+const ionian =      [2, 2, 1, 2, 2, 2, 1];
+const dorian =      [2, 1, 2, 2, 2, 1, 2];
+const phrygian =    [1, 2, 2, 2, 1, 2, 2];
+const lydian =      [2, 2, 2, 1, 2, 2, 1];
+const mixolydian =  [2, 2, 1, 2, 2, 1, 2];
+const aeolian =     [2, 1, 2, 2, 1, 2, 2];
+const locrian =     [1, 2, 2, 1, 2, 2, 2];
 
 const scales = {
   ionian,
@@ -96,14 +99,19 @@ export default {
     buildFret(index) {
       const fret = document.createElement("div");
       fret.className = "fret";
-      fret.style.marginLeft = `${index * 64}px`;
+      fret.style.marginLeft = `${index * FRET_SIZE}px`;
 
       return fret;
     },
-    buildDot(index) {
+    buildDot(index, note) {
       const dot = document.createElement("div");
       dot.className = "dot";
-      dot.style.marginLeft = `${index * 64 + 28}px`;
+      dot.style.marginLeft = `${(index * FRET_SIZE) + DOT_SIZE - FRET_SIZE}px`;
+
+      const tooltip = document.createElement("span");
+      tooltip.className = "tooltip";
+      tooltip.innerText = note;
+      dot.appendChild(tooltip);
 
       return dot;
     },
@@ -113,27 +121,35 @@ export default {
         element.innerHTML = "";
       });
     },
+    getNotesInCurrentScale() {
+      const currentToneIndex = tones.indexOf(this.currentTone);
+      const tonesStartingInSelected = tones.map((_, i) => tones[(currentToneIndex + i) % tones.length]);
+
+      const notesInScale = [tonesStartingInSelected[0]];
+      const selectedScale = scales[this.currentScale];
+      let cursor = 0;
+      for (let i = 0; i < selectedScale.length; i ++) {
+        cursor = (cursor + selectedScale[i]) % tonesStartingInSelected.length;
+        notesInScale.push(tonesStartingInSelected[cursor]);
+      }
+
+      return notesInScale;
+    },
     drawScale() {
       this.resetStrings();
 
+      const notesInScale = this.getNotesInCurrentScale();
+
       guitarStrings.forEach((string, stringIndex) => {
-        let noteIndex = string.indexOf(this.currentTone);
-
-        const drawDot = () => {
-          const dot = this.buildDot(noteIndex);
-          const stringElement = document.getElementsByClassName("string")[
-            stringIndex
-          ];
-          stringElement.appendChild(dot);
-        };
-
-        scales[this.currentScale].forEach(interval => {
-          drawDot();
-          noteIndex = (noteIndex + interval) % NUMBER_OF_NOTES;
+        const stringElement = document.getElementsByClassName("string")[
+          stringIndex
+        ];
+        string.forEach((note, noteIndex) => {
+          if (notesInScale.includes(note)) {
+            const dot = this.buildDot(noteIndex, note);
+            stringElement.appendChild(dot);
+          }
         });
-
-        drawDot(); // draw last note
-        drawDot(); // draw last note
       });
     }
   },
@@ -184,6 +200,7 @@ html {
   display: flex;
   justify-content: center;
   margin-top: 22px;
+  margin-left: 64px;
   flex-direction: column;
   position: relative;
 }
@@ -215,5 +232,23 @@ html {
   top: 0;
   width: 8px;
   background-color: brown;
+}
+
+.tooltip {
+  visibility: hidden;
+  width: 30px;
+  background-color: #AAA;
+  color: #fff;
+  text-align: center;
+  border-radius: 50px;
+  padding: 5px 0;
+  margin: 20px 20px;
+
+  position: absolute;
+  z-index: 1;
+}
+
+.dot:hover .tooltip {
+  visibility: visible;
 }
 </style>
