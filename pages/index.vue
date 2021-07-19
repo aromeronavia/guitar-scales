@@ -212,7 +212,7 @@ export default {
     _drawNotes(notes, noteFormat={}) {
       /*
         notes: Array of notes
-        noteFormat: An objects associating each note to its format (extra className)
+        noteFormat: An object associating each note to its format (extra className)
       */
       guitarStrings.forEach((string, stringIndex) => {
         const stringElement = document.getElementsByClassName("string")[
