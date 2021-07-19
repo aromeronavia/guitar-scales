@@ -58,6 +58,11 @@ const NUMBER_OF_NOTES = 12;
 const FRET_SIZE = 64;
 const DOT_SIZE = 28;
 
+const DISPLAY_MODES = {
+  CHORD: "CHORD",
+  SCALE: "SCALE",
+};
+
 const tones = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
 const buildString = note => {
@@ -102,12 +107,12 @@ const major7 =          [4, 3, 4];
 const major9 =          [4, 3, 4, 3];
 const major11 =         [4, 3, 4, 3, 3];
 const dominant7 =       [4, 3, 3];
+const diminished =      [3, 3, 3, 3];
+const halfDiminished =  [3, 3, 4];
 const minor =           [3, 4];
 const minor7 =          [3, 4, 3];
 const minor9 =          [3, 4, 3, 4];
 const minor11 =         [3, 4, 3, 4, 3];
-const diminished =      [3, 3, 3, 3];
-const halfDiminished =  [3, 3, 4];
 
 const chords = {
   major,
@@ -115,12 +120,12 @@ const chords = {
   major9,
   major11,
   dominant7,
+  diminished,
+  halfDiminished,
   minor,
   minor7,
   minor9,
   minor11,
-  diminished,
-  halfDiminished,
 };
 
 export default {
@@ -132,6 +137,7 @@ export default {
       currentTone: "E",
       currentScale: "dorian",
       currentChord: "major",
+      displayMode: DISPLAY_MODES.SCALE,
     };
   },
   methods: {
@@ -142,9 +148,12 @@ export default {
 
       return fret;
     },
-    buildDot(index, note) {
+    buildDot(index, note, className=undefined) {
       const dot = document.createElement("div");
       dot.className = "dot";
+      if (className) {
+        dot.className = [...dot.className.split(" "), className].join(" ");
+      }
       dot.style.marginLeft = `${(index * FRET_SIZE) + DOT_SIZE - FRET_SIZE}px`;
 
       const tooltip = document.createElement("span");
@@ -188,35 +197,58 @@ export default {
 
       return notesInChord;
     },
-    drawNotes(notes) {
+    getChordFormat(notesInChord) {
+      const formats = [
+        "dot--root",
+        "dot--secondNote",
+        "dot--thirdNote",
+        "dot--fourthNote",
+        "dot--fifthNote",
+        "dot--sixthNote",
+      ];
+
+      return notesInChord.reduce((acc, note, noteIndex) => ({ ...acc, [note]: formats[noteIndex % formats.length] }), {});
+    },
+    _drawNotes(notes, noteFormat={}) {
+      /*
+        notes: Array of notes
+        noteFormat: An objects associating each note to its format (extra className)
+      */
       guitarStrings.forEach((string, stringIndex) => {
         const stringElement = document.getElementsByClassName("string")[
           stringIndex
         ];
         string.forEach((note, noteIndex) => {
           if (notes.includes(note)) {
-            const dot = this.buildDot(noteIndex, note);
+            const dot = this.buildDot(noteIndex, note, noteFormat[note]);
             stringElement.appendChild(dot);
           }
         });
       });
     },
     drawScale() {
+      this.displayMode = DISPLAY_MODES.SCALE;
       this.resetStrings();
 
-      const notesInScale = this.getNotesInCurrentScale();
-      this.drawNotes(notesInScale);
+      const notes = this.getNotesInCurrentScale();
+      this._drawNotes(notes);
     },
     drawChord() {
+      this.displayMode = DISPLAY_MODES.CHORD;
       this.resetStrings();
 
-      const notesInScale = this.getNotesInCurrentChord();
-      this.drawNotes(notesInScale);
+      const notes = this.getNotesInCurrentChord();
+      const chordFormat = this.getChordFormat(notes);
+      this._drawNotes(notes, chordFormat);
     }
   },
   watch: {
     currentTone: function() {
-      this.drawScale();
+      if (this.displayMode === DISPLAY_MODES.SCALE) {
+        this.drawScale();
+      } else {
+        this.drawChord();
+      }
     },
     currentScale: function() {
       this.drawScale();
@@ -277,6 +309,26 @@ html {
   background-color: black;
   margin-left: 28px;
   position: absolute;
+}
+
+/* TODO: Choose a better color palette */
+.dot--root {
+  background-color: red;
+}
+.dot--secondNote {
+  background-color: blue;
+}
+.dot--thirdNote {
+  background-color: green;
+}
+.dot--fourthNote {
+  background-color: yellow;
+}
+.dot--fifthNote {
+  background-color: purple;
+}
+.dot--sixthNote {
+  background-color: orange;
 }
 
 .string {
