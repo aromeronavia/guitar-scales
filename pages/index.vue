@@ -37,6 +37,17 @@
         >{{ scale }}</option
       >
     </select>
+
+    <label>Chord</label>
+    <select v-model="currentChord">
+      <option
+        v-for="chord in chordsOptions"
+        :key="chord"
+        :value="chord"
+        :selected="chord === currentChord"
+        >{{ chord }}</option
+      >
+    </select>
   </div>
 </template>
 
@@ -86,13 +97,41 @@ const scales = {
   locrian
 };
 
+const major =           [4, 3];
+const major7 =          [4, 3, 4];
+const major9 =          [4, 3, 4, 3];
+const major11 =         [4, 3, 4, 3, 3];
+const dominant7 =       [4, 3, 3];
+const minor =           [3, 4];
+const minor7 =          [3, 4, 3];
+const minor9 =          [3, 4, 3, 4];
+const minor11 =         [3, 4, 3, 4, 3];
+const diminished =      [3, 3, 3, 3];
+const halfDiminished =  [3, 3, 4];
+
+const chords = {
+  major,
+  major7,
+  major9,
+  major11,
+  dominant7,
+  minor,
+  minor7,
+  minor9,
+  minor11,
+  diminished,
+  halfDiminished,
+};
+
 export default {
   data: function() {
     return {
       tones,
       scalesOptions: Object.keys(scales),
+      chordsOptions: Object.keys(chords),
       currentTone: "E",
-      currentScale: "dorian"
+      currentScale: "dorian",
+      currentChord: "major",
     };
   },
   methods: {
@@ -135,22 +174,44 @@ export default {
 
       return notesInScale;
     },
-    drawScale() {
-      this.resetStrings();
+    getNotesInCurrentChord() {
+      const currentToneIndex = tones.indexOf(this.currentTone);
+      const tonesStartingInSelected = tones.map((_, i) => tones[(currentToneIndex + i) % tones.length]);
 
-      const notesInScale = this.getNotesInCurrentScale();
+      const notesInChord = [tonesStartingInSelected[0]];
+      const selectedChord = chords[this.currentChord];
+      let cursor = 0;
+      for (let i = 0; i < selectedChord.length; i ++) {
+        cursor = (cursor + selectedChord[i]) % tonesStartingInSelected.length;
+        notesInChord.push(tonesStartingInSelected[cursor]);
+      }
 
+      return notesInChord;
+    },
+    drawNotes(notes) {
       guitarStrings.forEach((string, stringIndex) => {
         const stringElement = document.getElementsByClassName("string")[
           stringIndex
         ];
         string.forEach((note, noteIndex) => {
-          if (notesInScale.includes(note)) {
+          if (notes.includes(note)) {
             const dot = this.buildDot(noteIndex, note);
             stringElement.appendChild(dot);
           }
         });
       });
+    },
+    drawScale() {
+      this.resetStrings();
+
+      const notesInScale = this.getNotesInCurrentScale();
+      this.drawNotes(notesInScale);
+    },
+    drawChord() {
+      this.resetStrings();
+
+      const notesInScale = this.getNotesInCurrentChord();
+      this.drawNotes(notesInScale);
     }
   },
   watch: {
@@ -159,7 +220,10 @@ export default {
     },
     currentScale: function() {
       this.drawScale();
-    }
+    },
+    currentChord: function() {
+      this.drawChord();
+    },
   },
   mounted: function() {
     for (let i = 0; i < NUMBER_OF_FRETS; i++) {
