@@ -37,6 +37,17 @@
         >{{ scale }}</option
       >
     </select>
+
+    <label>Chord</label>
+    <select v-model="currentChord">
+      <option
+        v-for="chord in chordsOptions"
+        :key="chord"
+        :value="chord"
+        :selected="chord === currentChord"
+        >{{ chord }}</option
+      >
+    </select>
   </div>
 </template>
 
@@ -46,6 +57,11 @@ const NUMBER_OF_NOTES = 12;
 
 const FRET_SIZE = 64;
 const DOT_SIZE = 28;
+
+const DISPLAY_MODES = {
+  CHORD: "CHORD",
+  SCALE: "SCALE",
+};
 
 const tones = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
@@ -86,13 +102,42 @@ const scales = {
   locrian
 };
 
+const major =           [4, 3];
+const major7 =          [4, 3, 4];
+const major9 =          [4, 3, 4, 3];
+const major11 =         [4, 3, 4, 3, 3];
+const dominant7 =       [4, 3, 3];
+const diminished =      [3, 3, 3];
+const halfDiminished =  [3, 3, 4];
+const minor =           [3, 4];
+const minor7 =          [3, 4, 3];
+const minor9 =          [3, 4, 3, 4];
+const minor11 =         [3, 4, 3, 4, 3];
+
+const chords = {
+  major,
+  major7,
+  major9,
+  major11,
+  dominant7,
+  diminished,
+  halfDiminished,
+  minor,
+  minor7,
+  minor9,
+  minor11,
+};
+
 export default {
   data: function() {
     return {
       tones,
       scalesOptions: Object.keys(scales),
+      chordsOptions: Object.keys(chords),
       currentTone: "E",
-      currentScale: "dorian"
+      currentScale: "dorian",
+      currentChord: "major",
+      displayMode: DISPLAY_MODES.SCALE,
     };
   },
   methods: {
@@ -103,9 +148,12 @@ export default {
 
       return fret;
     },
-    buildDot(index, note) {
+    buildDot(index, note, className=undefined) {
       const dot = document.createElement("div");
       dot.className = "dot";
+      if (className) {
+        dot.className = [...dot.className.split(" "), className].join(" ");
+      }
       dot.style.marginLeft = `${(index * FRET_SIZE) + DOT_SIZE - FRET_SIZE}px`;
 
       const tooltip = document.createElement("span");
@@ -121,45 +169,86 @@ export default {
         element.innerHTML = "";
       });
     },
-    getNotesInCurrentScale() {
+    _getNotes(noteDistances) {
       const currentToneIndex = tones.indexOf(this.currentTone);
       const tonesStartingInSelected = tones.map((_, i) => tones[(currentToneIndex + i) % tones.length]);
 
-      const notesInScale = [tonesStartingInSelected[0]];
-      const selectedScale = scales[this.currentScale];
+      const notes = [tonesStartingInSelected[0]];
       let cursor = 0;
-      for (let i = 0; i < selectedScale.length; i ++) {
-        cursor = (cursor + selectedScale[i]) % tonesStartingInSelected.length;
-        notesInScale.push(tonesStartingInSelected[cursor]);
-      }
+      noteDistances.forEach((distance) => {
+        cursor = (cursor + distance) % tonesStartingInSelected.length;
+        notes.push(tonesStartingInSelected[cursor]);
+      });
 
-      return notesInScale;
+      return notes;
     },
-    drawScale() {
-      this.resetStrings();
+    getNotesInCurrentScale() {
+      const selectedScale = scales[this.currentScale];
+      return this._getNotes(selectedScale);
+    },
+    getNotesInCurrentChord() {
+      const selectedChord = chords[this.currentChord];
+      return this._getNotes(selectedChord);
+    },
+    getChordFormat(notesInChord) {
+      const formats = [
+        "dot--root",
+        "dot--secondNote",
+        "dot--thirdNote",
+        "dot--fourthNote",
+        "dot--fifthNote",
+        "dot--sixthNote",
+      ];
 
-      const notesInScale = this.getNotesInCurrentScale();
-
+      return notesInChord.reduce((acc, note, noteIndex) => ({ ...acc, [note]: formats[noteIndex % formats.length] }), {});
+    },
+    _drawNotes(notes, noteFormat={}) {
+      /*
+        notes: Array of notes
+        noteFormat: An object associating each note to its format (extra className)
+      */
       guitarStrings.forEach((string, stringIndex) => {
         const stringElement = document.getElementsByClassName("string")[
           stringIndex
         ];
         string.forEach((note, noteIndex) => {
-          if (notesInScale.includes(note)) {
-            const dot = this.buildDot(noteIndex, note);
+          if (notes.includes(note)) {
+            const dot = this.buildDot(noteIndex, note, noteFormat[note]);
             stringElement.appendChild(dot);
           }
         });
       });
+    },
+    drawScale() {
+      this.displayMode = DISPLAY_MODES.SCALE;
+      this.resetStrings();
+
+      const notes = this.getNotesInCurrentScale();
+      this._drawNotes(notes);
+    },
+    drawChord() {
+      this.displayMode = DISPLAY_MODES.CHORD;
+      this.resetStrings();
+
+      const notes = this.getNotesInCurrentChord();
+      const chordFormat = this.getChordFormat(notes);
+      this._drawNotes(notes, chordFormat);
     }
   },
   watch: {
     currentTone: function() {
-      this.drawScale();
+      if (this.displayMode === DISPLAY_MODES.SCALE) {
+        this.drawScale();
+      } else {
+        this.drawChord();
+      }
     },
     currentScale: function() {
       this.drawScale();
-    }
+    },
+    currentChord: function() {
+      this.drawChord();
+    },
   },
   mounted: function() {
     for (let i = 0; i < NUMBER_OF_FRETS; i++) {
@@ -213,6 +302,26 @@ html {
   background-color: black;
   margin-left: 28px;
   position: absolute;
+}
+
+/* TODO: Choose a better color palette */
+.dot--root {
+  background-color: red;
+}
+.dot--secondNote {
+  background-color: blue;
+}
+.dot--thirdNote {
+  background-color: green;
+}
+.dot--fourthNote {
+  background-color: yellow;
+}
+.dot--fifthNote {
+  background-color: purple;
+}
+.dot--sixthNote {
+  background-color: orange;
 }
 
 .string {
