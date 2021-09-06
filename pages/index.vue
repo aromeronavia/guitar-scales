@@ -5,14 +5,7 @@
         {{ i }}
       </li>
     </ul>
-    <div class="strings">
-      <div class="string" />
-      <div class="string" />
-      <div class="string" />
-      <div class="string" />
-      <div class="string" />
-      <div class="string" />
-    </div>
+    <div id="strings" class="strings" />
 
     <label>Note</label>
     <select v-model="currentTone">
@@ -48,6 +41,12 @@
         >{{ chord }}</option
       >
     </select>
+
+    <br />
+
+    Write a comma separated list of the open string notes in your instrument
+    <input v-model="stringsAsText" type="text" />
+    <button v-on:click="updateStrings">Change Strings!</button>
   </div>
 </template>
 
@@ -56,6 +55,8 @@ const NUMBER_OF_FRETS = 13;
 const NUMBER_OF_NOTES = 12;
 
 const FRET_SIZE = 64;
+const STRING_SEPARATION = 24;
+const STRING_THICKNESS = 8;
 const DOT_SIZE = 28;
 
 const DISPLAY_MODES = {
@@ -138,6 +139,8 @@ export default {
       currentScale: "dorian",
       currentChord: "major",
       displayMode: DISPLAY_MODES.SCALE,
+      currentStrings: guitarStrings,
+      stringsAsText: "",
     };
   },
   methods: {
@@ -145,6 +148,7 @@ export default {
       const fret = document.createElement("div");
       fret.className = "fret";
       fret.style.marginLeft = `${index * FRET_SIZE}px`;
+      fret.style.height = `${(STRING_THICKNESS * this.currentStrings.length) + (STRING_SEPARATION * (this.currentStrings.length-1))}px`;
 
       return fret;
     },
@@ -163,11 +167,20 @@ export default {
 
       return dot;
     },
-    resetStrings() {
-      const stringElements = document.getElementsByClassName("string");
-      stringElements.forEach(element => {
-        element.innerHTML = "";
+    resetFretboard() {
+      const container = document.getElementById("strings");
+      container.innerHTML = "";
+
+      this.currentStrings.forEach((string) => {
+        const stringElem = document.createElement("div");
+        stringElem.className = "string";
+        container.appendChild(stringElem);
       });
+
+      for (let i = 0; i < NUMBER_OF_FRETS; i++) {
+        const fret = this.buildFret(i);
+        container.appendChild(fret);
+      }
     },
     _getNotes(noteDistances) {
       const currentToneIndex = tones.indexOf(this.currentTone);
@@ -202,12 +215,19 @@ export default {
 
       return notesInChord.reduce((acc, note, noteIndex) => ({ ...acc, [note]: formats[noteIndex % formats.length] }), {});
     },
+    updateStrings() {
+      this.currentStrings = this.stringsAsText.trim().toUpperCase().split(",").reverse().map((note) => buildString(note));
+      this.resetFretboard();
+
+      const notes = this.getNotesInCurrentScale();
+      this._drawNotes(notes);
+    },
     _drawNotes(notes, noteFormat={}) {
       /*
         notes: Array of notes
         noteFormat: An object associating each note to its format (extra className)
       */
-      guitarStrings.forEach((string, stringIndex) => {
+      this.currentStrings.forEach((string, stringIndex) => {
         const stringElement = document.getElementsByClassName("string")[
           stringIndex
         ];
@@ -221,14 +241,14 @@ export default {
     },
     drawScale() {
       this.displayMode = DISPLAY_MODES.SCALE;
-      this.resetStrings();
+      this.resetFretboard();
 
       const notes = this.getNotesInCurrentScale();
       this._drawNotes(notes);
     },
     drawChord() {
       this.displayMode = DISPLAY_MODES.CHORD;
-      this.resetStrings();
+      this.resetFretboard();
 
       const notes = this.getNotesInCurrentChord();
       const chordFormat = this.getChordFormat(notes);
@@ -251,11 +271,7 @@ export default {
     },
   },
   mounted: function() {
-    for (let i = 0; i < NUMBER_OF_FRETS; i++) {
-      const fret = this.buildFret(i);
-      const container = document.getElementsByClassName("strings")[0];
-      container.appendChild(fret);
-    }
+    this.resetFretboard();
 
     this.drawScale();
   }
@@ -336,7 +352,6 @@ html {
 
 .fret {
   position: absolute;
-  height: 168px;
   border-radius: 4px;
   top: 0;
   width: 8px;
