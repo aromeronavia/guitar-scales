@@ -171,9 +171,14 @@ export default {
       const container = document.getElementById("strings");
       container.innerHTML = "";
 
-      this.currentStrings.forEach((string) => {
+      this.currentStrings.forEach((string, index) => {
         const stringElem = document.createElement("div");
         stringElem.className = "string";
+
+        if (index === this.currentStrings.length - 1) {
+          stringElem.style["margin-bottom"] = 0;
+        }
+
         container.appendChild(stringElem);
       });
 
@@ -222,18 +227,19 @@ export default {
       const notes = this.getNotesInCurrentScale();
       this._drawNotes(notes);
     },
-    _drawNotes(notes, noteFormat={}) {
+    _drawNotes(scaleNotes, noteFormat={}) {
       /*
-        notes: Array of notes
+        scaleNotes: Array of scaleNotes
         noteFormat: An object associating each note to its format (extra className)
       */
       this.currentStrings.forEach((string, stringIndex) => {
         const stringElement = document.getElementsByClassName("string")[
           stringIndex
         ];
-        string.forEach((note, noteIndex) => {
-          if (notes.includes(note)) {
-            const dot = this.buildDot(noteIndex, note, noteFormat[note]);
+        string.forEach((currentNote, noteIndex) => {
+          if (scaleNotes.includes(currentNote)) {
+            const dot = this.buildDot(noteIndex, currentNote, noteFormat[currentNote]);
+
             stringElement.appendChild(dot);
           }
         });
@@ -280,7 +286,7 @@ export default {
 
 <style>
 html {
-  background-color: #dfdfdf;
+  background-color: #f3f3f3;
   padding-left: 100px;
 }
 
@@ -306,8 +312,11 @@ html {
   justify-content: center;
   margin-top: 22px;
   margin-left: 64px;
+  margin-bottom: 28px;
   flex-direction: column;
   position: relative;
+  width: min-content;
+  background: url('http://i.stack.imgur.com/jGlzr.png') no-repeat;
 }
 
 .dot {
@@ -315,7 +324,7 @@ html {
   height: 16px;
   margin-top: -4px;
   border-radius: 100%;
-  background-color: black;
+  background-color: #4d1009;
   margin-left: 28px;
   position: absolute;
 }
@@ -343,10 +352,10 @@ html {
 .string {
   display: block;
   width: 776px;
-  height: 8px;
-  background-color: black;
+  height: 5px;
+  background-color: #c9ae5d;
   border-radius: 4px;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
   position: relative;
 }
 
@@ -355,13 +364,13 @@ html {
   border-radius: 4px;
   top: 0;
   width: 8px;
-  background-color: brown;
+  background-color: #0d090a;
 }
 
 .tooltip {
   visibility: hidden;
   width: 30px;
-  background-color: #AAA;
+  background-color: #7692ff;
   color: #fff;
   text-align: center;
   border-radius: 50px;
