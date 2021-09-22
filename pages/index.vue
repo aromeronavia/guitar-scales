@@ -324,7 +324,7 @@ html {
   height: 16px;
   margin-top: -4px;
   border-radius: 100%;
-  background-color: #4d1009;
+  background-color: #0d1009;
   margin-left: 28px;
   position: absolute;
 }
