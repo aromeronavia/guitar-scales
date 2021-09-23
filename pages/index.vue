@@ -1,10 +1,10 @@
 <template>
   <div class="container">
-    <ul class="fret-numbers">
-      <li class="fret-number" v-for="(n, i) in 13" :key="i + 1">
+    <div class="fret-numbers">
+      <span class="fret-number" v-for="(n, i) in 13" :key="i + 1">
         {{ i }}
-      </li>
-    </ul>
+      </span>
+    </div>
     <div id="strings" class="strings" />
 
     <label>Note</label>
@@ -290,16 +290,16 @@ html {
 }
 
 .fret-numbers {
-  padding: 0;
+  margin-top: 20px;
 }
 
 .fret-number {
-  display: inline;
-  margin-left: 48px;
+  list-style-type: none;
+  margin-left: 50px;
 }
 
 .fret-number:first-child {
-  margin-left: 36px;
+  margin-left: -56px;
 }
 
 .container {
@@ -312,7 +312,7 @@ html {
 .strings {
   display: flex;
   justify-content: center;
-  margin-top: 22px;
+  margin-top: 20px;
   margin-bottom: 28px;
   flex-direction: column;
   position: relative;
