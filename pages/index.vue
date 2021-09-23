@@ -314,7 +314,6 @@ html {
   display: flex;
   justify-content: center;
   margin-top: 22px;
-  margin-left: 64px;
   margin-bottom: 28px;
   flex-direction: column;
   position: relative;
