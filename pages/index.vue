@@ -287,7 +287,6 @@ export default {
 <style>
 html {
   background-color: #f3f3f3;
-  padding-left: 100px;
 }
 
 .fret-numbers {
