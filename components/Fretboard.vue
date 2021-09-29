@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import { tones, scales, chords, DISPLAY_MODES } from '/constants';
+
 const NUMBER_OF_FRETS = 13;
 const NUMBER_OF_NOTES = 12;
 
@@ -17,13 +19,6 @@ const FRET_SIZE = 64;
 const STRING_SEPARATION = 24;
 const STRING_THICKNESS = 8;
 const DOT_SIZE = 28;
-
-const DISPLAY_MODES = {
-  CHORD: "CHORD",
-  SCALE: "SCALE",
-};
-
-const tones = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
 const buildString = note => {
   const index = tones.indexOf(note);
@@ -36,59 +31,7 @@ const buildString = note => {
   return stringNotes;
 };
 
-const ionian =      [2, 2, 1, 2, 2, 2, 1];
-const dorian =      [2, 1, 2, 2, 2, 1, 2];
-const phrygian =    [1, 2, 2, 2, 1, 2, 2];
-const lydian =      [2, 2, 2, 1, 2, 2, 1];
-const mixolydian =  [2, 2, 1, 2, 2, 1, 2];
-const aeolian =     [2, 1, 2, 2, 1, 2, 2];
-const locrian =     [1, 2, 2, 1, 2, 2, 2];
-
-const scales = {
-  ionian,
-  dorian,
-  phrygian,
-  lydian,
-  mixolydian,
-  aeolian,
-  locrian
-};
-
-const major =           [4, 3];
-const major7 =          [4, 3, 4];
-const major9 =          [4, 3, 4, 3];
-const major11 =         [4, 3, 4, 3, 3];
-const dominant7 =       [4, 3, 3];
-const diminished =      [3, 3, 3];
-const halfDiminished =  [3, 3, 4];
-const minor =           [3, 4];
-const minor7 =          [3, 4, 3];
-const minor9 =          [3, 4, 3, 4];
-const minor11 =         [3, 4, 3, 4, 3];
-
-const chords = {
-  major,
-  major7,
-  major9,
-  major11,
-  dominant7,
-  diminished,
-  halfDiminished,
-  minor,
-  minor7,
-  minor9,
-  minor11,
-};
-
 export default {
-  data: function() {
-    return {
-      tones,
-      scalesOptions: Object.keys(scales),
-      chordsOptions: Object.keys(chords),
-      displayMode: DISPLAY_MODES.SCALE,
-    };
-  },
   computed: {
     tone() {
       return this.$store.state.tone;
@@ -101,6 +44,9 @@ export default {
     },
     strings() {
       return this.$store.state.strings;
+    },
+    mode() {
+      return this.$store.state.mode;
     }
   },
   methods: {
@@ -200,14 +146,14 @@ export default {
       });
     },
     drawScale() {
-      this.displayMode = DISPLAY_MODES.SCALE;
+      this.$store.commit("setMode", DISPLAY_MODES.SCALE);
       this.resetFretboard();
 
       const notes = this.getNotesInScale();
       this._drawNotes(notes);
     },
     drawChord() {
-      this.displayMode = DISPLAY_MODES.CHORD;
+      this.$store.commit("setMode", DISPLAY_MODES.CHORD);
       this.resetFretboard();
 
       const notes = this.getNotesInChord();
@@ -217,7 +163,7 @@ export default {
   },
   watch: {
     tone() {
-      if (this.displayMode === DISPLAY_MODES.SCALE) {
+      if (this.mode === DISPLAY_MODES.SCALE) {
         this.drawScale();
       } else {
         this.drawChord();

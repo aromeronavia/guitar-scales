@@ -44,6 +44,8 @@
 </template>
 
 <script>
+import { tones, scales, chords } from '/constants';
+
 export default {
   data() {
     return {
@@ -51,9 +53,11 @@ export default {
       currentScale: this.$store.state.scale,
       currentChord: this.$store.state.chord,
       stringsAsText: "",
+      tones,
+      scalesOptions: Object.keys(scales),
+      chordsOptions: Object.keys(chords),
     };
   },
-  props: ['tones', 'scalesOptions', 'chordsOptions'],
   methods: {
     onChangeTone(event) {
       this.currentTone = event.target.value;

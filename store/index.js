@@ -1,5 +1,7 @@
+import { DISPLAY_MODES } from '/constants';
+
 export const state = () => ({
-  mode: "scale",
+  mode: DISPLAY_MODES.SCALE,
   tone: "E",
   scale: "ionian",
   chord: "major",
