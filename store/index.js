@@ -5,7 +5,7 @@ export const state = () => ({
   tone: "E",
   scale: "ionian",
   chord: "major",
-  strings: ["E", "A", "D", "G", "B", "E"],
+  strings: ["E", "B", "G", "D", "A", "E"],
 });
 
 export const mutations = {
