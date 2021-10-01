@@ -3,7 +3,7 @@
     <nav class="navbar">
       <p>
         <a class="link" href="#">
-          Explore the freat
+          Explore the fret
         </a>
       </p>
       <p>
