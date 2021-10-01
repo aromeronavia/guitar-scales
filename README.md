@@ -1,5 +1,7 @@
 # guitar-scales
+This tool helps you visualize scales and chords on a fretted instrument.
 
+![screenshot](https://raw.githubusercontent.com/beeetooo/guitar-scales/main/assets/screenshot-2021-10-01.png)
 ## Build Setup
 
 ```bash
