@@ -13,27 +13,39 @@
 
     <br />
 
-    <label>Scale Mode</label>
-    <select v-model="currentScale" @change="onChangeScale($event)">
-      <option
-        v-for="scale in scalesOptions"
-        :key="scale"
-        :value="scale"
-        :selected="scale === currentScale"
-        >{{ scale }}</option
-      >
-    </select>
+    <span>Scale</span>
+    <label class="switch">
+      <input type="checkbox" v-model="chordMode" @change="onChangeMode($event)">
+      <div v-bind:class="{'slider-chord': chordMode, 'slider-scale': !chordMode}" />
+    </label>
+    <span>Chord</span>
 
-    <label>Chord</label>
-    <select v-model="currentChord" @change="onChangeChord($event)">
-      <option
-        v-for="chord in chordsOptions"
-        :key="chord"
-        :value="chord"
-        :selected="chord === currentChord"
-       >{{ chord }}</option
-      >
-    </select>
+    <br />
+
+    <div v-if="!chordMode">
+      <label>Scale</label>
+      <select v-model="currentScale" @change="onChangeScale($event)">
+        <option
+          v-for="scale in scalesOptions"
+          :key="scale"
+          :value="scale"
+          :selected="scale === currentScale"
+          >{{ scale }}</option
+        >
+      </select>
+    </div>
+
+    <div v-if="chordMode">
+      <label>Chord</label>
+      <select v-model="currentChord" @change="onChangeChord($event)">
+        <option
+          v-for="chord in chordsOptions"
+          :key="chord"
+          :value="chord"
+          :selected="chord === currentChord"
+        >{{ chord }}</option>
+      </select>
+    </div>
 
     <br />
 
@@ -44,7 +56,7 @@
 </template>
 
 <script>
-import { tones, scales, chords } from '/constants';
+import { tones, scales, chords, DISPLAY_MODES } from '/constants';
 
 export default {
   data() {
@@ -56,9 +68,14 @@ export default {
       tones,
       scalesOptions: Object.keys(scales),
       chordsOptions: Object.keys(chords),
+      chordMode: false,
     };
   },
   methods: {
+    onChangeMode(event) {
+      const mode = this.chordMode ? DISPLAY_MODES.CHORD : DISPLAY_MODES.SCALE;
+      this.$store.commit("setMode", mode);
+    },
     onChangeTone(event) {
       this.currentTone = event.target.value;
       this.$store.commit("setTone", event.target.value);
@@ -79,3 +96,31 @@ export default {
 };
 </script>
 
+<style>
+.switch {
+  cursor: pointer;
+  width: 80px;
+  border: 2px solid black;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider-chord {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: black;
+  border-radius: 0% 50% 50% 0%;
+  margin: 2px 2px 0px 20px;
+}
+.slider-scale {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: black;
+  border-radius: 50% 0% 0% 50%;
+  margin: 2px 20px 0px 2px;
+}
+</style>

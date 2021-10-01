@@ -93,6 +93,13 @@ export default {
         container.appendChild(fret);
       }
     },
+    drawFretboard() {
+      if (this.mode === DISPLAY_MODES.SCALE) {
+        this.drawScale();
+      } else {
+        this.drawChord();
+      }
+    },
     _getNotes(noteDistances) {
       const currentToneIndex = tones.indexOf(this.tone);
       const tonesStartingInSelected = tones.map((_, i) => tones[(currentToneIndex + i) % tones.length]);
@@ -162,12 +169,11 @@ export default {
     }
   },
   watch: {
+    mode() {
+      this.drawFretboard();
+    },
     tone() {
-      if (this.mode === DISPLAY_MODES.SCALE) {
-        this.drawScale();
-      } else {
-        this.drawChord();
-      }
+      this.drawFretboard();
     },
     scale() {
       this.drawScale();
@@ -176,12 +182,12 @@ export default {
       this.drawChord();
     },
     strings() {
-      this.drawScale();
+      this.drawFretboard();
     }
   },
   mounted: function() {
     this.resetFretboard();
-    this.drawScale();
+    this.drawFretboard();
   }
 };
 </script>
