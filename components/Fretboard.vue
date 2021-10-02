@@ -65,6 +65,8 @@ export default {
         dot.className = [...dot.className.split(" "), className].join(" ");
       }
       dot.style.marginLeft = `${(index * FRET_SIZE) + DOT_SIZE - FRET_SIZE}px`;
+      dot.addEventListener("mousedown", this.playNote);
+      dot.addEventListener("mouseup", this.stopPlayingNote);
 
       const tooltip = document.createElement("span");
       tooltip.className = "tooltip";
@@ -72,6 +74,20 @@ export default {
       dot.appendChild(tooltip);
 
       return dot;
+    },
+    playNote(event) {
+      event.preventDefault();
+
+      this.osc = this.audioContext.createOscillator();
+      this.osc.connect(this.mainGainNode);
+      this.osc.frequency.value = 3520.000000000000000;
+
+      this.osc.start();
+    },
+    stopPlayingNote(event) {
+      event.preventDefault();
+
+      this.osc.stop();
     },
     resetFretboard() {
       const container = document.getElementById("strings");
@@ -188,6 +204,11 @@ export default {
   mounted: function() {
     this.resetFretboard();
     this.drawFretboard();
+    this.osc = null;
+    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    this.mainGainNode = this.audioContext.createGain();
+    this.mainGainNode.connect(this.audioContext.destination);
+    this.mainGainNode.gain.value = 1.0;
   }
 };
 </script>
