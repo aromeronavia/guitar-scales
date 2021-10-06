@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { tones, scales, chords, DISPLAY_MODES } from '/constants';
+import { tones, scales, chords, DISPLAY_MODES, noteToFrequency } from '/constants';
 
 const NUMBER_OF_FRETS = 13;
 const NUMBER_OF_NOTES = 12;
@@ -65,7 +65,7 @@ export default {
         dot.className = [...dot.className.split(" "), className].join(" ");
       }
       dot.style.marginLeft = `${(index * FRET_SIZE) + DOT_SIZE - FRET_SIZE}px`;
-      dot.addEventListener("mousedown", this.playNote);
+      dot.addEventListener("mousedown", this.buildPlayNote(noteToFrequency[note]));
       dot.addEventListener("mouseup", this.stopPlayingNote);
 
       const tooltip = document.createElement("span");
@@ -75,14 +75,17 @@ export default {
 
       return dot;
     },
-    playNote(event) {
-      event.preventDefault();
+    buildPlayNote(frequency) {
+      const this_ = this;
+      return function(event) {
+        event.preventDefault();
 
-      this.osc = this.audioContext.createOscillator();
-      this.osc.connect(this.mainGainNode);
-      this.osc.frequency.value = 3520.000000000000000;
+        this_.osc = this_.audioContext.createOscillator();
+        this_.osc.connect(this_.mainGainNode);
+        this_.osc.frequency.value = frequency;
 
-      this.osc.start();
+        this_.osc.start();
+      };
     },
     stopPlayingNote(event) {
       event.preventDefault();
@@ -257,6 +260,7 @@ html {
   background-color: #0d1009;
   margin-left: 28px;
   position: absolute;
+  cursor: pointer;
 }
 
 /* TODO: Choose a better color palette */
