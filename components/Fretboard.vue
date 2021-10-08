@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="fret-numbers">
-      <span class="fret-number" v-for="(n, i) in 13" :key="i + 1">
+      <span class="fret-number" v-for="(n, i) in frets" :key="i + 1">
         {{ i }}
       </span>
     </div>
@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { tones, scales, chords, DISPLAY_MODES, noteToFrequency } from '/constants';
+import { tones, scales, chords, DISPLAY_MODES, noteToFrequency } from '@/constants';
 
 const NUMBER_OF_FRETS = 13;
 const NUMBER_OF_NOTES = 12;
@@ -20,18 +20,12 @@ const STRING_SEPARATION = 24;
 const STRING_THICKNESS = 8;
 const DOT_SIZE = 28;
 
-const buildString = note => {
-  const index = tones.indexOf(note);
-  const stringNotes = [];
-
-  for (let i = 0; i < NUMBER_OF_FRETS; i++) {
-    stringNotes.push(tones[(index + i) % NUMBER_OF_NOTES]);
-  }
-
-  return stringNotes;
-};
-
 export default {
+  data: function () {
+    return {
+      frets: NUMBER_OF_FRETS,
+    }
+  },
   computed: {
     tone() {
       return this.$store.state.tone;
@@ -161,7 +155,7 @@ export default {
         const stringElement = document.getElementsByClassName("string")[
           stringIndex
         ];
-        const string = buildString(stringNote);
+        const string = this.buildString(stringNote);
         string.forEach((currentNote, noteIndex) => {
           if (scaleNotes.includes(currentNote)) {
             const dot = this.buildDot(noteIndex, currentNote, noteFormat[currentNote]);
@@ -170,6 +164,16 @@ export default {
           }
         });
       });
+    },
+    buildString(note) {
+      const index = tones.indexOf(note);
+      const stringNotes = [];
+
+      for (let i = 0; i < NUMBER_OF_FRETS; i++) {
+        stringNotes.push(tones[(index + i) % NUMBER_OF_NOTES]);
+      }
+
+      return stringNotes;
     },
     drawScale() {
       this.$store.commit("setMode", DISPLAY_MODES.SCALE);
