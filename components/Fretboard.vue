@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="fretboard">
     <div class="fret-numbers">
       <span class="fret-number" v-for="(n, i) in frets" :key="i + 1">
         {{ i }}
@@ -225,6 +225,10 @@ html {
   background-color: #f3f3f3;
 }
 
+.fretboard {
+  margin-right: 40px;
+}
+
 .fret-numbers {
   margin-top: 20px;
 }
@@ -241,8 +245,8 @@ html {
 .container {
   position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: center
+  align-items: center;
+  margin: 0 100px 0 100px;
 }
 
 .strings {
