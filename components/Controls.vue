@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="controls">
     <label>Note</label>
     <select v-model="currentTone" @change="onChangeTone($event)">
       <option
@@ -22,19 +22,6 @@
 
     <br />
 
-    <div v-if="!chordMode">
-      <label>Scale</label>
-      <select v-model="currentScale" @change="onChangeScale($event)">
-        <option
-          v-for="scale in scalesOptions"
-          :key="scale"
-          :value="scale"
-          :selected="scale === currentScale"
-          >{{ scale }}</option
-        >
-      </select>
-    </div>
-
     <div v-if="chordMode">
       <label>Chord</label>
       <select v-model="currentChord" @change="onChangeChord($event)">
@@ -47,9 +34,22 @@
       </select>
     </div>
 
+    <div v-else>
+      <label>Scale</label>
+      <select v-model="currentScale" @change="onChangeScale($event)">
+        <option
+          v-for="scale in scalesOptions"
+          :key="scale"
+          :value="scale"
+          :selected="scale === currentScale"
+          >{{ scale }}</option
+        >
+      </select>
+    </div>
+
     <br />
 
-    Write a comma separated list of the open string notes in your instrument
+    <label>Write a comma separated list of the open string notes in your instrument</label>
     <input v-model="stringsAsText" type="text" />
     <button v-on:click="updateStrings">Change Strings!</button>
   </div>
@@ -97,6 +97,10 @@ export default {
 </script>
 
 <style>
+.controls {
+  margin-top: 36px;
+}
+
 .switch {
   cursor: pointer;
   width: 80px;
