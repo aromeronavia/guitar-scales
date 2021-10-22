@@ -1,3 +1,5 @@
+export const A4_FREQUENCY = 440.0;
+
 export const tones = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
 const ionian =      [2, 2, 1, 2, 2, 2, 1];
