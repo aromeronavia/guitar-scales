@@ -1,4 +1,8 @@
-export const A4_FREQUENCY = 440.0;
+export const A4 = {
+  FREQUENCY: 440.00,
+  NOTE_NAME: "A",
+  OCTAVE: 4,
+};
 
 export const tones = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
@@ -49,19 +53,4 @@ export const chords = {
 export const DISPLAY_MODES = {
   CHORD: "CHORD",
   SCALE: "SCALE",
-};
-
-export const noteToFrequency = {
-  "C": 523.25,
-  "C#": 554.37,
-  "D": 587.33,
-  "D#": 622.25,
-  "E": 659.25,
-  "F": 698.46,
-  "F#": 739.99,
-  "G": 783.99,
-  "G#": 830.61,
-  "A": 880.00,
-  "A#": 932.33,
-  "B": 987.77
 };
