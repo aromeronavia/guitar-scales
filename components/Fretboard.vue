@@ -10,7 +10,8 @@
 </template>
 
 <script>
-import { tones, scales, chords, DISPLAY_MODES, noteToFrequency } from '@/constants';
+import { tones, scales, chords, DISPLAY_MODES } from '@/constants';
+import Note from '@/engine/note';
 
 const NUMBER_OF_FRETS = 13;
 const NUMBER_OF_NOTES = 12;
@@ -59,12 +60,12 @@ export default {
         dot.className = [...dot.className.split(" "), className].join(" ");
       }
       dot.style.marginLeft = `${(index * FRET_SIZE) + DOT_SIZE - FRET_SIZE}px`;
-      dot.addEventListener("mousedown", this.buildPlayNote(noteToFrequency[note]));
+      dot.addEventListener("mousedown", this.buildPlayNote(note.getFrequency()));
       dot.addEventListener("mouseup", this.stopPlayingNote);
 
       const tooltip = document.createElement("span");
       tooltip.className = "tooltip";
-      tooltip.innerText = note;
+      tooltip.innerText = note.noteName;
       dot.appendChild(tooltip);
 
       return dot;
@@ -157,8 +158,8 @@ export default {
         ];
         const string = this.buildString(stringNote);
         string.forEach((currentNote, noteIndex) => {
-          if (scaleNotes.includes(currentNote)) {
-            const dot = this.buildDot(noteIndex, currentNote, noteFormat[currentNote]);
+          if (scaleNotes.includes(currentNote.noteName)) {
+            const dot = this.buildDot(noteIndex, currentNote, noteFormat[currentNote.noteName]);
 
             stringElement.appendChild(dot);
           }
@@ -166,11 +167,18 @@ export default {
       });
     },
     buildString(note) {
-      const index = tones.indexOf(note);
-      const stringNotes = [];
+      const index = tones.indexOf(note.noteName);
 
-      for (let i = 0; i < NUMBER_OF_FRETS; i++) {
-        stringNotes.push(tones[(index + i) % NUMBER_OF_NOTES]);
+      const stringNotes = [note];
+      for (let i = 1; i < NUMBER_OF_FRETS; i++) {
+        let noteIndex = index + i;
+        const noteName = tones[noteIndex % NUMBER_OF_NOTES];
+        let octave = note.octave + (tones.indexOf(noteName) <= index  ? 1 : 0);
+        stringNotes.push(
+          new Note({
+            noteName,
+            octave,
+        }));
       }
 
       return stringNotes;

@@ -57,8 +57,20 @@
 
 <script>
 import { tones, scales, chords, DISPLAY_MODES } from '/constants';
+import Note from '/engine/note';
 
 export default {
+  created() {
+    const stringNotes = [
+      new Note({ noteName: "E", octave: 5 }),
+      new Note({ noteName: "B", octave: 4 }),
+      new Note({ noteName: "G", octave: 4 }),
+      new Note({ noteName: "D", octave: 4 }),
+      new Note({ noteName: "A", octave: 3 }),
+      new Note({ noteName: "E", octave: 3 }),
+    ];
+    this.$store.commit("setStrings", stringNotes);
+  },
   data() {
     return {
       currentTone: this.$store.state.tone,
@@ -90,7 +102,11 @@ export default {
     },
     updateStrings() {
       const parsedStrings = this.stringsAsText.trim().toUpperCase().split(",").reverse();
-      this.$store.commit("setStrings", parsedStrings);
+      const stringNotes = parsedStrings.map((noteAndOctave) => new Note({
+        noteName: noteAndOctave[0],
+        octave: parseInt(noteAndOctave[1])
+      }));
+      this.$store.commit("setStrings", stringNotes);
     },
   }
 };
