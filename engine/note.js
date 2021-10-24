@@ -1,23 +1,20 @@
-import { tones, A4_FREQUENCY } from '../constants';
+import { tones, A4 } from '../constants';
 
 
 export default class Note {
-  constructor(noteName, octave) {
-    this.noteName = noteName;
-    this.octave = octave;
+  constructor(options = {}) {
+    this.noteName = options.noteName || A4.NOTE_NAME;
+    this.octave = !isNaN(options.octave) ? options.octave : A4.OCTAVE;
   }
 
   getFrequency() {
     const power = this._getDistanceFromA4() / tones.length;
-    return parseFloat((A4_FREQUENCY * Math.pow(2, power)).toFixed(2));
+    return parseFloat((A4.FREQUENCY * Math.pow(2, power)).toFixed(2));
   }
 
   _getDistanceFromA4() {
-    const a4Octave = 4;
-    const a4NoteName = "A";
-
-    const octaveDifference = (this.octave - a4Octave) * tones.length;
-    const toneDifference =  tones.indexOf(this.noteName) - tones.indexOf(a4NoteName);
+    const octaveDifference = (this.octave - A4.OCTAVE) * tones.length;
+    const toneDifference =  tones.indexOf(this.noteName) - tones.indexOf(A4.NOTE_NAME);
 
     return octaveDifference + toneDifference;
   }
