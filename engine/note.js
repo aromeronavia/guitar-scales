@@ -5,6 +5,7 @@ export default class Note {
   constructor(options = {}) {
     this.noteName = options.noteName || A4.NOTE_NAME;
     this.octave = !isNaN(options.octave) ? options.octave : A4.OCTAVE;
+    this.frequency = this.getFrequency();
   }
 
   getFrequency() {

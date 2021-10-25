@@ -5,114 +5,95 @@
         {{ i }}
       </span>
     </div>
-    <div id="strings" class="strings" />
+    <Strings
+      ref="strings"
+      :key="stringsKey"
+      :frets="frets"
+      :scaleNotes="scaleNotes"
+      :chordNotes="chordNotes"
+      :chordFormat="chordFormat"
+    />
   </div>
 </template>
 
 <script>
+import Vue from 'vue';
+import { mapState } from 'vuex';
+
 import { tones, scales, chords, DISPLAY_MODES } from '@/constants';
+import StringComponent from "@/components/String.vue";
+import FretComponent from "@/components/Fret.vue";
 import Note from '@/engine/note';
 
-const NUMBER_OF_FRETS = 13;
-const NUMBER_OF_NOTES = 12;
-
-const FRET_SIZE = 64;
-const STRING_SEPARATION = 24;
-const STRING_THICKNESS = 8;
-const DOT_SIZE = 28;
+const StringClass = Vue.extend(StringComponent);
+const FretClass = Vue.extend(FretComponent);
 
 export default {
   data: function () {
     return {
-      frets: NUMBER_OF_FRETS,
+      frets: 13,
+      stringsKey: 0,
     }
   },
   computed: {
-    tone() {
-      return this.$store.state.tone;
+    ...mapState({
+      tone: 'tone',
+      scale: 'scale',
+      chord: 'chord',
+      strings: 'strings',
+      mode: 'mode',
+    }),
+    scaleNotes: function () {
+      return this.getNotesInScale();
     },
-    scale() {
-      return this.$store.state.scale;
+    chordNotes: function () {
+      return this.getNotesInChord();
     },
-    chord() {
-      return this.$store.state.chord;
-    },
-    strings() {
-      return this.$store.state.strings;
-    },
-    mode() {
-      return this.$store.state.mode;
+    chordFormat: function () {
+      return this.getChordFormat(this.chordNotes);
     }
   },
   methods: {
-    buildFret(index) {
-      const fret = document.createElement("div");
-      fret.className = "fret";
-      fret.style.marginLeft = `${index * FRET_SIZE}px`;
-      fret.style.height = `${(STRING_THICKNESS * this.strings.length) + (STRING_SEPARATION * (this.strings.length-1))}px`;
-
-      return fret;
-    },
-    buildDot(index, note, className=undefined) {
-      const dot = document.createElement("div");
-      dot.className = "dot";
-      if (className) {
-        dot.className = [...dot.className.split(" "), className].join(" ");
-      }
-      dot.style.marginLeft = `${(index * FRET_SIZE) + DOT_SIZE - FRET_SIZE}px`;
-      dot.addEventListener("mousedown", this.buildPlayNote(note.getFrequency()));
-      dot.addEventListener("mouseup", this.stopPlayingNote);
-
-      const tooltip = document.createElement("span");
-      tooltip.className = "tooltip";
-      tooltip.innerText = note.noteName;
-      dot.appendChild(tooltip);
-
-      return dot;
-    },
-    buildPlayNote(frequency) {
-      const this_ = this;
-      return function(event) {
-        event.preventDefault();
-
-        this_.osc = this_.audioContext.createOscillator();
-        this_.osc.connect(this_.mainGainNode);
-        this_.osc.frequency.value = frequency;
-
-        this_.osc.start();
-      };
-    },
-    stopPlayingNote(event) {
-      event.preventDefault();
-
-      this.osc.stop();
-    },
-    resetFretboard() {
-      const container = document.getElementById("strings");
-      container.innerHTML = "";
-
-      this.strings.forEach((string, index) => {
-        const stringElem = document.createElement("div");
-        stringElem.className = "string";
-
-        if (index === this.strings.length - 1) {
-          stringElem.style["margin-bottom"] = 0;
-        }
-
-        container.appendChild(stringElem);
+    renderFret(index) {
+      const instance = new FretClass({
+        propsData: { index, numberOfStrings: this.strings.length }
       });
+      instance.$mount();
 
-      for (let i = 0; i < NUMBER_OF_FRETS; i++) {
-        const fret = this.buildFret(i);
-        container.appendChild(fret);
+      return instance.$el;
+    },
+    renderFretboard() {
+      if (this.mode === DISPLAY_MODES.SCALE) {
+        this.setScaleMode();
+      } else {
+        this.setChordMode();
       }
     },
-    drawFretboard() {
-      if (this.mode === DISPLAY_MODES.SCALE) {
-        this.drawScale();
-      } else {
-        this.drawChord();
-      }
+    getChordFormat(notesInChord) {
+      const formats = [
+        "dot--root",
+        "dot--secondNote",
+        "dot--thirdNote",
+        "dot--fourthNote",
+        "dot--fifthNote",
+        "dot--sixthNote",
+      ];
+
+      return notesInChord.reduce((acc, note, noteIndex) => ({ ...acc, [note]: formats[noteIndex % formats.length] }), {});
+    },
+    setScaleMode() {
+      this.$store.commit("setMode", DISPLAY_MODES.SCALE);
+    },
+    setChordMode() {
+      this.$store.commit("setMode", DISPLAY_MODES.CHORD);
+    },
+    getNotesInScale() {
+      const selectedScale = scales[this.scale];
+      return this._getNotes(selectedScale);
+    },
+    getNotesInChord() {
+      const selectedChord = chords[this.chord];
+      return this._getNotes(selectedChord);
     },
     _getNotes(noteDistances) {
       const currentToneIndex = tones.indexOf(this.tone);
@@ -127,98 +108,29 @@ export default {
 
       return notes;
     },
-    getNotesInScale() {
-      const selectedScale = scales[this.scale];
-      return this._getNotes(selectedScale);
-    },
-    getNotesInChord() {
-      const selectedChord = chords[this.chord];
-      return this._getNotes(selectedChord);
-    },
-    getChordFormat(notesInChord) {
-      const formats = [
-        "dot--root",
-        "dot--secondNote",
-        "dot--thirdNote",
-        "dot--fourthNote",
-        "dot--fifthNote",
-        "dot--sixthNote",
-      ];
-
-      return notesInChord.reduce((acc, note, noteIndex) => ({ ...acc, [note]: formats[noteIndex % formats.length] }), {});
-    },
-    _drawNotes(scaleNotes, noteFormat={}) {
-      /*
-        scaleNotes: Array of scaleNotes
-        noteFormat: An object associating each note to its format (extra className)
-      */
-      this.strings.forEach((stringNote, stringIndex) => {
-        const stringElement = document.getElementsByClassName("string")[
-          stringIndex
-        ];
-        const string = this.buildString(stringNote);
-        string.forEach((currentNote, noteIndex) => {
-          if (scaleNotes.includes(currentNote.noteName)) {
-            const dot = this.buildDot(noteIndex, currentNote, noteFormat[currentNote.noteName]);
-
-            stringElement.appendChild(dot);
-          }
-        });
-      });
-    },
-    buildString(note) {
-      const index = tones.indexOf(note.noteName);
-
-      const stringNotes = [note];
-      for (let i = 1; i < NUMBER_OF_FRETS; i++) {
-        let noteIndex = index + i;
-        const noteName = tones[noteIndex % NUMBER_OF_NOTES];
-        let octave = note.octave + (tones.indexOf(noteName) <= index  ? 1 : 0);
-        stringNotes.push(
-          new Note({
-            noteName,
-            octave,
-        }));
-      }
-
-      return stringNotes;
-    },
-    drawScale() {
-      this.$store.commit("setMode", DISPLAY_MODES.SCALE);
-      this.resetFretboard();
-
-      const notes = this.getNotesInScale();
-      this._drawNotes(notes);
-    },
-    drawChord() {
-      this.$store.commit("setMode", DISPLAY_MODES.CHORD);
-      this.resetFretboard();
-
-      const notes = this.getNotesInChord();
-      const chordFormat = this.getChordFormat(notes);
-      this._drawNotes(notes, chordFormat);
+    reRender() {
+      this.stringsKey += 1;
     }
   },
   watch: {
     mode() {
-      this.drawFretboard();
+      this.renderFretboard();
     },
     tone() {
-      this.drawFretboard();
+      this.renderFretboard();
     },
     scale() {
-      this.drawScale();
+      this.setScaleMode();
     },
     chord() {
-      this.drawChord();
+      this.setChordMode();
     },
     strings() {
-      this.drawFretboard();
+      this.renderFretboard();
     }
   },
   mounted: function() {
-    this.resetFretboard();
-    this.drawFretboard();
+    this.renderFretboard();
     this.osc = null;
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
     this.mainGainNode = this.audioContext.createGain();
@@ -297,24 +209,6 @@ html {
 }
 .dot--sixthNote {
   background-color: orange;
-}
-
-.string {
-  display: block;
-  width: 776px;
-  height: 5px;
-  background-color: #c9ae5d;
-  border-radius: 4px;
-  margin-bottom: 28px;
-  position: relative;
-}
-
-.fret {
-  position: absolute;
-  border-radius: 4px;
-  top: 0;
-  width: 8px;
-  background-color: #0d090a;
 }
 
 .tooltip {
