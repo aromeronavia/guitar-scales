@@ -108,9 +108,6 @@ export default {
 
       return notes;
     },
-    reRender() {
-      this.stringsKey += 1;
-    }
   },
   watch: {
     mode() {

@@ -5,8 +5,8 @@
       :style="{
         marginLeft: `${(index * fretSize) + dotSize - fretSize}px`
       }"
-      @mousedown="$emit('mousedown')"
-      @mouseup="$emit('mouseup')"
+      @mousedown="playNote"
+      @mouseup="stopNote"
     />
     <span class="tooltip">
       {note.noteName}
@@ -22,6 +22,29 @@ export default {
       fretSize: 64,
       dotSize: 28
     }
+  },
+  methods: {
+    playNote() {
+      event.preventDefault();
+
+      this.osc = this.audioContext.createOscillator();
+      this.osc.connect(this.mainGainNode);
+      this.osc.frequency.value = this.note.frequency;
+
+      this.osc.start();
+    },
+    stopNote(event) {
+      event.preventDefault();
+
+      this.osc.stop();
+    },
+  },
+  mounted: function () {
+    this._osc = null;
+    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    this.mainGainNode = this.audioContext.createGain();
+    this.mainGainNode.connect(this.audioContext.destination);
+    this.mainGainNode.gain.value = 1.0;
   }
 }
 </script>
