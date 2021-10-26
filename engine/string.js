@@ -21,4 +21,18 @@ export default class StringBuilder {
 
     return stringNotes;
   }
+  getNotes(scale, tone) {
+    const noteDistances = scales[scale];
+    const currentToneIndex = tones.indexOf(tone);
+    const tonesStartingInSelected = tones.map((_, i) => tones[(currentToneIndex + i) % tones.length]);
+
+    const notes = [tonesStartingInSelected[0]];
+    let cursor = 0;
+    noteDistances.forEach((distance) => {
+      cursor = (cursor + distance) % tonesStartingInSelected.length;
+      notes.push(tonesStartingInSelected[cursor]);
+    });
+
+    return notes;
+  }
 }

@@ -17,16 +17,9 @@
 </template>
 
 <script>
-import Vue from 'vue';
 import { mapState } from 'vuex';
 
-import { tones, scales, chords, DISPLAY_MODES } from '@/constants';
-import StringComponent from "@/components/String.vue";
-import FretComponent from "@/components/Fret.vue";
-import Note from '@/engine/note';
-
-const StringClass = Vue.extend(StringComponent);
-const FretClass = Vue.extend(FretComponent);
+import { tones, scales, chords } from '@/constants';
 
 export default {
   data: function () {
@@ -42,10 +35,8 @@ export default {
       chord: 'chord',
       strings: 'strings',
       mode: 'mode',
+      scaleNotes: 'scaleNotes'
     }),
-    scaleNotes: function () {
-      return this.getNotesInScale();
-    },
     chordNotes: function () {
       return this.getNotesInChord();
     },
@@ -54,21 +45,6 @@ export default {
     }
   },
   methods: {
-    renderFret(index) {
-      const instance = new FretClass({
-        propsData: { index, numberOfStrings: this.strings.length }
-      });
-      instance.$mount();
-
-      return instance.$el;
-    },
-    renderFretboard() {
-      if (this.mode === DISPLAY_MODES.SCALE) {
-        this.setScaleMode();
-      } else {
-        this.setChordMode();
-      }
-    },
     getChordFormat(notesInChord) {
       const formats = [
         "dot--root",
@@ -79,61 +55,17 @@ export default {
         "dot--sixthNote",
       ];
 
-      return notesInChord.reduce((acc, note, noteIndex) => ({ ...acc, [note]: formats[noteIndex % formats.length] }), {});
-    },
-    setScaleMode() {
-      this.$store.commit("setMode", DISPLAY_MODES.SCALE);
-    },
-    setChordMode() {
-      this.$store.commit("setMode", DISPLAY_MODES.CHORD);
-    },
-    getNotesInScale() {
-      const selectedScale = scales[this.scale];
-      return this._getNotes(selectedScale);
+      // TODO: Refactor this to make it work again
+      // return notesInChord.reduce((acc, note, noteIndex) => ({ ...acc, [note]: formats[noteIndex % formats.length] }), {});
+      return {};
     },
     getNotesInChord() {
       const selectedChord = chords[this.chord];
-      return this._getNotes(selectedChord);
-    },
-    _getNotes(noteDistances) {
-      const currentToneIndex = tones.indexOf(this.tone);
-      const tonesStartingInSelected = tones.map((_, i) => tones[(currentToneIndex + i) % tones.length]);
-
-      const notes = [tonesStartingInSelected[0]];
-      let cursor = 0;
-      noteDistances.forEach((distance) => {
-        cursor = (cursor + distance) % tonesStartingInSelected.length;
-        notes.push(tonesStartingInSelected[cursor]);
-      });
-
-      return notes;
+      // TODO: Refactor this to make it work again
+      // return this._getNotes(selectedChord);
+      return {};
     },
   },
-  watch: {
-    mode() {
-      this.renderFretboard();
-    },
-    tone() {
-      this.renderFretboard();
-    },
-    scale() {
-      this.setScaleMode();
-    },
-    chord() {
-      this.setChordMode();
-    },
-    strings() {
-      this.renderFretboard();
-    }
-  },
-  mounted: function() {
-    this.renderFretboard();
-    this.osc = null;
-    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    this.mainGainNode = this.audioContext.createGain();
-    this.mainGainNode.connect(this.audioContext.destination);
-    this.mainGainNode.gain.value = 1.0;
-  }
 };
 </script>
 

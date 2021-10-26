@@ -4,15 +4,17 @@
       v-for="(string, index) in strings"
       :isLastString="index === strings.length - 1"
     >
-      <Dot
-        v-for="(note, index) in stringNotes[index]"
-        v-if="shouldRenderDot(note, index)"
-        :note="note"
-        :index="index"
-      />
+      <template v-for="(note, noteIndex) in stringNotes[index]">
+        <Dot
+          v-if="shouldRenderDot(note, noteIndex)"
+          :note="note"
+          :index="noteIndex"
+        />
+      </template>
     </String>
     <Fret
       v-for="(fret, index) in frets"
+      :key="index"
       :index="index"
       :numberOfStrings="strings.length"
     />
