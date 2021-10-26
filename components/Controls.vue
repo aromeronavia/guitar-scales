@@ -15,7 +15,7 @@
 
     <span>Scale</span>
     <label class="switch">
-      <input type="checkbox" v-model="chordMode" @change="onChangeMode($event)">
+      <input type="checkbox" v-model="chordMode" @change="onChangeMode" />
       <div v-bind:class="{'slider-chord': chordMode, 'slider-scale': !chordMode}" />
     </label>
     <span>Chord</span>
@@ -42,8 +42,7 @@
           :key="scale"
           :value="scale"
           :selected="scale === currentScale"
-          >{{ scale }}</option
-        >
+          >{{ scale }}</option>
       </select>
     </div>
 
@@ -56,15 +55,13 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import { tones, scales, chords, DISPLAY_MODES } from '/constants';
 import Note from '/engine/note';
 
 export default {
   data() {
     return {
-      currentTone: this.$store.state.tone,
-      currentScale: this.$store.state.scale,
-      currentChord: this.$store.state.chord,
       stringsAsText: "",
       tones,
       scalesOptions: Object.keys(scales),
@@ -72,6 +69,11 @@ export default {
       chordMode: false,
     };
   },
+  computed: mapState({
+    currentTone: 'tone',
+    currentScale: 'scale',
+    currentChord: 'chord',
+  }),
   methods: {
     onChangeMode(event) {
       const mode = this.chordMode ? DISPLAY_MODES.CHORD : DISPLAY_MODES.SCALE;

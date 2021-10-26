@@ -50,6 +50,8 @@ export const mutations = {
     state.chord = chord;
   },
   setStrings(state, strings) {
+    console.warn(strings);
     state.strings = strings;
+    state.stringNotes = strings.map(note => builder.build(note, state.tone));
   },
 }
