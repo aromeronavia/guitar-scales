@@ -4,12 +4,24 @@
       v-for="(string, index) in strings"
       :isLastString="index === strings.length - 1"
     >
-      <template v-for="(note, noteIndex) in stringNotes[index]">
-        <Dot
-          v-if="shouldRenderDot(note, noteIndex)"
-          :note="note"
-          :index="noteIndex"
-        />
+      <template v-if="isScaleMode">
+        <template v-for="(note, noteIndex) in stringNotes[index]">
+          <Dot
+            v-if="shouldRenderScaleDot(note, noteIndex)"
+            :note="note"
+            :index="noteIndex"
+          />
+        </template>
+      </template>
+
+      <template v-else>
+        <template v-for="(note, noteIndex) in stringNotes[index]">
+          <Dot
+            v-if="shouldRenderChordDot(note, noteIndex)"
+            :note="note"
+            :index="noteIndex"
+          />
+        </template>
       </template>
     </String>
     <Fret
@@ -23,9 +35,7 @@
 
 <script>
 import { mapState } from "vuex";
-
-const FRET_SIZE = 64;
-const DOT_SIZE = 28;
+import { DISPLAY_MODES } from "@/constants";
 
 export default {
   props: {
@@ -38,13 +48,20 @@ export default {
       required: true,
     }
   },
-  computed: mapState({
-    strings: 'strings',
-    stringNotes: 'stringNotes',
-  }),
+  computed: {
+    ...mapState({
+      strings: 'strings',
+      stringNotes: 'stringNotes',
+      chordNotes: 'chordNotes',
+      isScaleMode: state => state.mode === DISPLAY_MODES.SCALE
+    }),
+  },
   methods: {
-    shouldRenderDot(note) {
+    shouldRenderScaleDot(note) {
       return this.scaleNotes.includes(note.noteName);
+    },
+    shouldRenderChordDot(note) {
+      return this.chordNotes.includes(note.noteName);
     }
   },
 }

@@ -31,6 +31,7 @@ export const state = () => ({
     builder.build(A_STRING),
     builder.build(SECOND_E_STRING),
   ],
+  chordNotes: builder.getChordNotes("major", "E"),
   scaleNotes: builder.getNotes("ionian", "E")
 });
 
@@ -40,7 +41,8 @@ export const mutations = {
   },
   setTone(state, tone) {
     state.tone = tone;
-    state.scaleNotes = builder.getNotes(scale, tone);
+    state.scaleNotes = builder.getNotes(state.scale, tone);
+    state.chordNotes = builder.getChordNotes(state.chord, tone);
   },
   setScale(state, scale) {
     state.scale = scale;
@@ -48,9 +50,9 @@ export const mutations = {
   },
   setChord(state, chord) {
     state.chord = chord;
+    state.chordNotes = builder.getChordNotes(chord, state.tone);
   },
   setStrings(state, strings) {
-    console.warn(strings);
     state.strings = strings;
     state.stringNotes = strings.map(note => builder.build(note, state.tone));
   },

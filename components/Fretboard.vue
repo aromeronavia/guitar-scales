@@ -33,14 +33,6 @@ export default {
       mode: 'mode',
       scaleNotes: 'scaleNotes'
     }),
-    /*
-    chordNotes: function () {
-      return this.getNotesInChord();
-    },
-    chordFormat: function () {
-      return this.getChordFormat(this.chordNotes);
-    }
-     */
   },
   /*methods: {
     getChordFormat(notesInChord) {

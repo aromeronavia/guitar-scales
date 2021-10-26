@@ -24,7 +24,7 @@
 
     <div v-if="chordMode">
       <label>Chord</label>
-      <select v-model="currentChord" @change="onChangeChord($event)">
+      <select @change="onChangeChord($event)">
         <option
           v-for="chord in chordsOptions"
           :key="chord"
@@ -36,7 +36,7 @@
 
     <div v-else>
       <label>Scale</label>
-      <select v-model="currentScale" @change="onChangeScale($event)">
+      <select @change="onChangeScale($event)">
         <option
           v-for="scale in scalesOptions"
           :key="scale"
@@ -80,15 +80,12 @@ export default {
       this.$store.commit("setMode", mode);
     },
     onChangeTone(event) {
-      this.currentTone = event.target.value;
       this.$store.commit("setTone", event.target.value);
     },
     onChangeScale(event) {
-      this.currentScale = event.target.value;
       this.$store.commit("setScale", event.target.value);
     },
     onChangeChord(event) {
-      this.currentChord = event.target.value;
       this.$store.commit("setChord", event.target.value);
     },
     updateStrings() {
