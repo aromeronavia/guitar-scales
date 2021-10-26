@@ -36,12 +36,6 @@ export default {
     scaleNotes: {
       type: Array,
       required: true,
-    },
-    chordNotes: {
-      required: true,
-    },
-    chordFormat: {
-      required: true,
     }
   },
   computed: mapState({
@@ -55,3 +49,16 @@ export default {
   },
 }
 </script>
+
+<style>
+.strings {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 28px;
+  flex-direction: column;
+  position: relative;
+  width: min-content;
+  background: url('http://i.stack.imgur.com/jGlzr.png') no-repeat;
+}
+</style>

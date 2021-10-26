@@ -10,16 +10,12 @@
       :key="stringsKey"
       :frets="frets"
       :scaleNotes="scaleNotes"
-      :chordNotes="chordNotes"
-      :chordFormat="chordFormat"
     />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-
-import { tones, scales, chords } from '@/constants';
 
 export default {
   data: function () {
@@ -37,14 +33,16 @@ export default {
       mode: 'mode',
       scaleNotes: 'scaleNotes'
     }),
+    /*
     chordNotes: function () {
       return this.getNotesInChord();
     },
     chordFormat: function () {
       return this.getChordFormat(this.chordNotes);
     }
+     */
   },
-  methods: {
+  /*methods: {
     getChordFormat(notesInChord) {
       const formats = [
         "dot--root",
@@ -55,17 +53,9 @@ export default {
         "dot--sixthNote",
       ];
 
-      // TODO: Refactor this to make it work again
-      // return notesInChord.reduce((acc, note, noteIndex) => ({ ...acc, [note]: formats[noteIndex % formats.length] }), {});
-      return {};
+      return notesInChord.reduce((acc, note, noteIndex) => ({ ...acc, [note]: formats[noteIndex % formats.length] }), {});
     },
-    getNotesInChord() {
-      const selectedChord = chords[this.chord];
-      // TODO: Refactor this to make it work again
-      // return this._getNotes(selectedChord);
-      return {};
-    },
-  },
+  }*/
 };
 </script>
 
@@ -96,65 +86,5 @@ html {
   display: flex;
   align-items: center;
   margin: 0 100px 0 100px;
-}
-
-.strings {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  margin-bottom: 28px;
-  flex-direction: column;
-  position: relative;
-  width: min-content;
-  background: url('http://i.stack.imgur.com/jGlzr.png') no-repeat;
-}
-
-.dot {
-  width: 16px;
-  height: 16px;
-  margin-top: -4px;
-  border-radius: 100%;
-  background-color: #0d1009;
-  margin-left: 28px;
-  position: absolute;
-  cursor: pointer;
-}
-
-/* TODO: Choose a better color palette */
-.dot--root {
-  background-color: red;
-}
-.dot--secondNote {
-  background-color: blue;
-}
-.dot--thirdNote {
-  background-color: green;
-}
-.dot--fourthNote {
-  background-color: yellow;
-}
-.dot--fifthNote {
-  background-color: purple;
-}
-.dot--sixthNote {
-  background-color: orange;
-}
-
-.tooltip {
-  visibility: hidden;
-  width: 30px;
-  background-color: #7692ff;
-  color: #fff;
-  text-align: center;
-  border-radius: 50px;
-  padding: 5px 0;
-  margin: 20px 20px;
-
-  position: absolute;
-  z-index: 1;
-}
-
-.dot:hover .tooltip {
-  visibility: visible;
 }
 </style>

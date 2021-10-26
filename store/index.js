@@ -31,7 +31,7 @@ export const state = () => ({
     builder.build(A_STRING),
     builder.build(SECOND_E_STRING),
   ],
-  scaleNotes: builder.getNotes("ionian")
+  scaleNotes: builder.getNotes("ionian", "E")
 });
 
 export const mutations = {
@@ -40,6 +40,7 @@ export const mutations = {
   },
   setTone(state, tone) {
     state.tone = tone;
+    state.scaleNotes = builder.getNotes(scale, tone);
   },
   setScale(state, scale) {
     state.scale = scale;
