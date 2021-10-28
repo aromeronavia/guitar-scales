@@ -7,23 +7,16 @@
     </div>
     <Strings
       ref="strings"
-      :key="stringsKey"
-      :frets="frets"
-      :scaleNotes="scaleNotes"
+      :notes="notes"
     />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
+import { DISPLAY_MODES } from '/constants';
 
 export default {
-  data: function () {
-    return {
-      frets: 13,
-      stringsKey: 0,
-    }
-  },
   computed: {
     ...mapState({
       tone: 'tone',
@@ -31,8 +24,10 @@ export default {
       chord: 'chord',
       strings: 'strings',
       mode: 'mode',
-      scaleNotes: 'scaleNotes'
+      scaleNotes: 'scaleNotes',
+      chordNotes: 'chordNotes'
     }),
+    notes: state => state.mode === DISPLAY_MODES.SCALE ? state.scaleNotes : state.chordNotes,
   },
   /*methods: {
     getChordFormat(notesInChord) {
