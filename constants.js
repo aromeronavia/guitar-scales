@@ -67,3 +67,5 @@ export const DISPLAY_MODES = {
   CHORD: 'CHORD',
   SCALE: 'SCALE'
 }
+
+export const NUMBER_OF_FRETS = 13
