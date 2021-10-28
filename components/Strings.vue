@@ -25,12 +25,12 @@
 
 <script>
 import { mapState } from "vuex";
-import { NUMBER_OF_FRETS } from "@/constants";
+import { FRET_COUNT } from "@/constants";
 
 export default {
   data: function () {
     return {
-      frets: NUMBER_OF_FRETS,
+      frets: FRET_COUNT,
     };
   },
   props: {

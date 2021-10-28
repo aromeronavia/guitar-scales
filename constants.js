@@ -68,4 +68,4 @@ export const DISPLAY_MODES = {
   SCALE: 'SCALE'
 }
 
-export const NUMBER_OF_FRETS = 13
+export const FRET_COUNT = 13
