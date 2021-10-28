@@ -1,14 +1,17 @@
 import { DISPLAY_MODES } from '/constants';
-import StringBuilder from "@/engine/string";
+import StringBuilder from "@/engine/string-builder";
+import NoteSequenceGenerator from '@/engine/note-sequence-generator';
 import Note from "@/engine/note";
 
-const builder = new StringBuilder();
 const E_STRING = new Note({ noteName: "E", octave: 5 });
 const B_STRING = new Note({ noteName: "B", octave: 4 });
 const G_STRING = new Note({ noteName: "G", octave: 4 });
 const D_STRING = new Note({ noteName: "D", octave: 4 });
 const A_STRING = new Note({ noteName: "A", octave: 3 });
 const SECOND_E_STRING = new Note({ noteName: "E", octave: 3 });
+
+const builder = new StringBuilder();
+const noteSequenceGenerator = new NoteSequenceGenerator();
 
 export const state = () => ({
   mode: DISPLAY_MODES.SCALE,
@@ -31,8 +34,8 @@ export const state = () => ({
     builder.build(A_STRING),
     builder.build(SECOND_E_STRING),
   ],
-  chordNotes: builder.getChordNotes("major", "E"),
-  scaleNotes: builder.getNotes("ionian", "E")
+  chordNotes: noteSequenceGenerator.getChordNotes("major", "E"),
+  scaleNotes: noteSequenceGenerator.getScaleNotes("ionian", "E")
 });
 
 export const mutations = {
@@ -41,16 +44,17 @@ export const mutations = {
   },
   setTone(state, tone) {
     state.tone = tone;
-    state.scaleNotes = builder.getNotes(state.scale, tone);
-    state.chordNotes = builder.getChordNotes(state.chord, tone);
+    state.scaleNotes = noteSequenceGenerator.getScaleNotes(state.scale, tone);
+    state.chordNotes = noteSequenceGenerator.getChordNotes(state.chord, tone);
   },
   setScale(state, scale) {
     state.scale = scale;
-    state.scaleNotes = builder.getNotes(scale, state.tone);
+    console.log(scale);
+    state.scaleNotes = noteSequenceGenerator.getScaleNotes(scale, state.tone);
   },
   setChord(state, chord) {
     state.chord = chord;
-    state.chordNotes = builder.getChordNotes(chord, state.tone);
+    state.chordNotes = noteSequenceGenerator.getChordNotes(chord, state.tone);
   },
   setStrings(state, strings) {
     state.strings = strings;
