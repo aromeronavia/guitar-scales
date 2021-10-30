@@ -27,22 +27,14 @@ export default {
       scaleNotes: 'scaleNotes',
       chordNotes: 'chordNotes'
     }),
-    notes: state => state.mode === DISPLAY_MODES.SCALE ? state.scaleNotes : state.chordNotes,
+    notes: state => {
+      if (state.mode === DISPLAY_MODES.SCALE) {
+        return state.scaleNotes.map(note => note.noteName)
+      } else {
+        return state.chordNotes.map(note => note.noteName)
+      }
+    }
   },
-  /*methods: {
-    getChordFormat(notesInChord) {
-      const formats = [
-        "dot--root",
-        "dot--secondNote",
-        "dot--thirdNote",
-        "dot--fourthNote",
-        "dot--fifthNote",
-        "dot--sixthNote",
-      ];
-
-      return notesInChord.reduce((acc, note, noteIndex) => ({ ...acc, [note]: formats[noteIndex % formats.length] }), {});
-    },
-  }*/
 };
 </script>
 

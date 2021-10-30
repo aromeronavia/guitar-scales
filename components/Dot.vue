@@ -24,7 +24,7 @@ export default {
     }
   },
   methods: {
-    playNote() {
+    playNote(event) {
       event.preventDefault();
 
       this.osc = this.audioContext.createOscillator();

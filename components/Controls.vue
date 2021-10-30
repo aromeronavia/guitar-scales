@@ -34,6 +34,7 @@
       </select>
     </div>
 
+
     <div v-else>
       <label>Scale</label>
       <select @change="onChangeScale($event)">
@@ -45,6 +46,9 @@
           >{{ scale }}</option>
       </select>
     </div>
+
+    <button v-if="!reproducingScale" ref="reproduceScaleButton" @click="reproduceScale">Reproduce scale</button>
+    <button v-else @click="stopScale">Stop scale</button>
 
     <br />
 
@@ -67,12 +71,15 @@ export default {
       scalesOptions: Object.keys(scales),
       chordsOptions: Object.keys(chords),
       chordMode: false,
+      reproducingScale: false,
+      scalePlayerInterval: null
     };
   },
   computed: mapState({
     currentTone: 'tone',
     currentScale: 'scale',
     currentChord: 'chord',
+    scaleNotes: 'scaleNotes',
   }),
   methods: {
     onChangeMode(event) {
@@ -96,6 +103,33 @@ export default {
       }));
       this.$store.commit("setStrings", stringNotes);
     },
+    reproduceScale()  {
+      this.reproducingScale = true
+      let iterator = 0;
+
+      this.scalePlayerInterval = setInterval(() => {
+        if (iterator > 0) {
+          this.osc.stop();
+        }
+        this.osc = this.audioContext.createOscillator()
+        this.osc.connect(this.mainGainNode);
+        this.osc.frequency.value = this.scaleNotes[iterator % this.scaleNotes.length].frequency;
+        this.osc.start();
+        iterator += 1;
+      }, 500);
+    },
+    stopScale() {
+      this.osc.stop();
+      clearInterval(this.scalePlayerInterval);
+
+      this.reproducingScale = false;
+    }
+  },
+  mounted: function () {
+    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    this.mainGainNode = this.audioContext.createGain();
+    this.mainGainNode.connect(this.audioContext.destination);
+    this.mainGainNode.gain.value = 0.5;
   }
 };
 </script>
