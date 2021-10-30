@@ -1,15 +1,14 @@
-import { tones, FRET_COUNT } from '@/constants'
-import Note from '@/engine/note'
-
+import { tones, FRET_COUNT } from '../constants'
+import Note from './note'
 
 export default class StringBuilder {
   build(note) {
-    const tonicIndex = tones.indexOf(note.noteName);
+    const tonicIndex = tones.indexOf(note.noteName)
 
-    const stringNotes = [note];
+    const stringNotes = [note]
     for (let i = 1; i < FRET_COUNT; i++) {
-      const noteName = tones[(tonicIndex + i) % tones.length];
-      let octave = note.octave + (tones.indexOf(noteName) <= tonicIndex ? 1 : 0);
+      const noteName = tones[(tonicIndex + i) % tones.length]
+      let octave = note.octave + (tones.indexOf(noteName) <= tonicIndex ? 1 : 0)
       stringNotes.push(
         new Note({
           noteName,
@@ -18,6 +17,6 @@ export default class StringBuilder {
       )
     }
 
-    return stringNotes;
+    return stringNotes
   }
 }

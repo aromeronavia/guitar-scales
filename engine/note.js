@@ -1,6 +1,5 @@
 import { tones, A4 } from '../constants';
 
-
 export default class Note {
   constructor(options = {}) {
     this.noteName = options.noteName || A4.NOTE_NAME;
