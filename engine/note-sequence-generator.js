@@ -1,4 +1,4 @@
-import { tones, scales, chords } from '@/constants'
+import { tones, scales, chords } from '../constants'
 
 export default class NoteSequenceGenerator {
   getScaleNotes(scaleName, tone) {
