@@ -15,7 +15,7 @@
 
     <span>Scale</span>
     <label class="switch">
-      <input type="checkbox" v-model="chordMode" @change="onChangeMode($event)">
+      <input type="checkbox" v-model="chordMode" @change="onChangeMode" />
       <div v-bind:class="{'slider-chord': chordMode, 'slider-scale': !chordMode}" />
     </label>
     <span>Chord</span>
@@ -24,7 +24,7 @@
 
     <div v-if="chordMode">
       <label>Chord</label>
-      <select v-model="currentChord" @change="onChangeChord($event)">
+      <select @change="onChangeChord($event)">
         <option
           v-for="chord in chordsOptions"
           :key="chord"
@@ -36,14 +36,13 @@
 
     <div v-else>
       <label>Scale</label>
-      <select v-model="currentScale" @change="onChangeScale($event)">
+      <select @change="onChangeScale($event)">
         <option
           v-for="scale in scalesOptions"
           :key="scale"
           :value="scale"
           :selected="scale === currentScale"
-          >{{ scale }}</option
-        >
+          >{{ scale }}</option>
       </select>
     </div>
 
@@ -56,26 +55,13 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import { tones, scales, chords, DISPLAY_MODES } from '/constants';
 import Note from '/engine/note';
 
 export default {
-  created() {
-    const stringNotes = [
-      new Note({ noteName: "E", octave: 5 }),
-      new Note({ noteName: "B", octave: 4 }),
-      new Note({ noteName: "G", octave: 4 }),
-      new Note({ noteName: "D", octave: 4 }),
-      new Note({ noteName: "A", octave: 3 }),
-      new Note({ noteName: "E", octave: 3 }),
-    ];
-    this.$store.commit("setStrings", stringNotes);
-  },
   data() {
     return {
-      currentTone: this.$store.state.tone,
-      currentScale: this.$store.state.scale,
-      currentChord: this.$store.state.chord,
       stringsAsText: "",
       tones,
       scalesOptions: Object.keys(scales),
@@ -83,21 +69,23 @@ export default {
       chordMode: false,
     };
   },
+  computed: mapState({
+    currentTone: 'tone',
+    currentScale: 'scale',
+    currentChord: 'chord',
+  }),
   methods: {
     onChangeMode(event) {
       const mode = this.chordMode ? DISPLAY_MODES.CHORD : DISPLAY_MODES.SCALE;
       this.$store.commit("setMode", mode);
     },
     onChangeTone(event) {
-      this.currentTone = event.target.value;
       this.$store.commit("setTone", event.target.value);
     },
     onChangeScale(event) {
-      this.currentScale = event.target.value;
       this.$store.commit("setScale", event.target.value);
     },
     onChangeChord(event) {
-      this.currentChord = event.target.value;
       this.$store.commit("setChord", event.target.value);
     },
     updateStrings() {

@@ -5,9 +5,11 @@ export default class Note {
   constructor(options = {}) {
     this.noteName = options.noteName || A4.NOTE_NAME;
     this.octave = !isNaN(options.octave) ? options.octave : A4.OCTAVE;
+    this.frequency = this._calculateFrequency();
+    this.degree = options.degree || null;
   }
 
-  getFrequency() {
+  _calculateFrequency() {
     const power = this._getDistanceFromA4() / tones.length;
     return parseFloat((A4.FREQUENCY * Math.pow(2, power)).toFixed(2));
   }
