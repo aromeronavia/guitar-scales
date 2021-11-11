@@ -1,10 +1,5 @@
 <template>
   <div class="fretboard">
-    <div class="fret-numbers">
-      <span class="fret-number" v-for="(n, i) in frets" :key="i + 1">
-        {{ i }}
-      </span>
-    </div>
     <Strings
       ref="strings"
       :notes="notes"
@@ -31,7 +26,7 @@ export default {
       if (state.mode === DISPLAY_MODES.SCALE) {
         return state.scaleNotes.map(note => note.noteName)
       } else {
-        return state.chordNotes.map(note => note.noteName)
+        return state.chordNotes
       }
     }
   },
@@ -45,19 +40,6 @@ html {
 
 .fretboard {
   margin-right: 40px;
-}
-
-.fret-numbers {
-  margin-top: 20px;
-}
-
-.fret-number {
-  list-style-type: none;
-  margin-left: 50px;
-}
-
-.fret-number:first-child {
-  margin-left: -56px;
 }
 
 .container {
